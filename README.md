@@ -1,144 +1,152 @@
 <div align="center">
 
-<img src="assets/cityfix-3d.gif" alt="CityFix 3D Animated Banner" width="100%">
+<a href="https://cityfix-hmv8.onrender.com/" target="_blank">
+  <img src="assets/cityfix-3d.gif" alt="CityFix - Smart City Complaint Management System" width="100%">
+</a>
 
 # 🏙️ CityFix
+
 ### Smart City Complaint Management System
 
 **A real-world web application developed as part of the Advanced Java course.**
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-0A84FF?style=for-the-badge&logo=render&logoColor=white)](https://cityfix-hmv8.onrender.com/)
-[![GitHub](https://img.shields.io/badge/Source-GitHub-111827?style=for-the-badge&logo=github&logoColor=white)](https://github.com/rabbi1067/cityFix)
-[![Java](https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.java.com/)
-[![Spring%20Boot](https://img.shields.io/badge/Spring%20Boot-4.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+<a href="https://cityfix-hmv8.onrender.com/" target="_blank">
+  <img src="https://img.shields.io/badge/🌐%20LIVE%20PROJECT-0A84FF?style=for-the-badge" alt="Live Project">
+</a>
+
+<a href="https://github.com/rabbi1067/cityFix" target="_blank">
+  <img src="https://img.shields.io/badge/💻%20GITHUB%20REPOSITORY-111827?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+</a>
+
+<br><br>
+
+<img src="https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk&logoColor=white">
+<img src="https://img.shields.io/badge/Spring%20Boot-4.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+<img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white">
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white">
+<img src="https://img.shields.io/badge/Thymeleaf-005F0F?style=for-the-badge&logo=thymeleaf&logoColor=white">
 
 </div>
 
 ---
 
-## 📌 About CityFix
+# 📌 About CityFix
 
-**CityFix** is a web-based city complaint management platform designed to make reporting, tracking, and resolving urban problems more organized and transparent.
+**CityFix** is a web-based **Smart City Complaint Management System** designed to make reporting, tracking, and resolving urban problems more organized, transparent, and user-friendly.
 
-Citizens can report problems with details and images, track progress, and provide a rating after resolution. Administrators can review complaints, manage status, record resolution information, and monitor reports from a centralized dashboard.
+Citizens can report city-related problems with descriptions, images, and location information. They can track complaint progress and provide ratings and feedback after the issue is resolved.
 
----
+Administrators can review complaints, manage their status, handle resolutions, monitor reports, and manage the overall complaint workflow from a centralized dashboard.
 
-## ✨ Key Features
-
-### 👤 Citizen Features
-- Secure registration and login
-- Forgot Password / Password Reset
-- Profile and personal information management
-- Submit complaints with images
-- Complaint location and map view
-- Track complaint status and history
-- Rating and feedback after resolution
-- Account settings
-- Day / Night mode
-
-### 🛠️ Admin Features
-- Admin dashboard
-- Manage citizens and complaints
-- Review and process reported issues
-- Update complaint status
-- Manage complaint resolution
-- Add resolution details and cost information
-- Reports and statistics
-- Role-based access control
-
-### 🤖 Smart Features
-- AI-assisted issue category and location detection
-- Estimated Resolution Cost suggestion
-- Public complaint / map visualization
-- Location-aware complaint handling
-
-### 🎨 User Experience
-- Light / Dark mode
-- Responsive mobile, tablet and desktop views
-- Professional loading animations
-- Form validation and error handling
-- Clean and user-friendly interface
+The project focuses on combining **clean backend architecture, security, database management, responsive UI, and real-world business logic**.
 
 ---
 
-## 🏗️ Architecture
+# ✨ Key Features
+
+## 👤 Citizen Features
+
+- 🔐 Secure Registration & Login
+- 🔑 Forgot Password / Password Reset
+- 👤 Profile Management
+- 📝 Submit City Complaints
+- 🖼️ Upload Complaint Images
+- 📍 Complaint Location & Map View
+- 📊 Track Complaint Status
+- 📚 View Complaint History
+- ⭐ Rating & Feedback After Resolution
+- ⚙️ Account Settings
+- 🌙 Day / Night Mode
+- 📱 Responsive Multi-Device Interface
+
+---
+
+## 🛠️ Admin Features
+
+- 📊 Admin Dashboard
+- 👥 Manage Citizens
+- 📋 Manage Complaints
+- 🔎 Review Reported Issues
+- 🔄 Update Complaint Status
+- 🛠️ Manage Complaint Resolution
+- 📝 Add Resolution Details
+- 💰 Estimated / Actual Resolution Cost Information
+- 📈 Reports & Statistics
+- 🔐 Role-Based Access Control
+
+---
+
+## 🤖 Smart & AI-Assisted Features
+
+- 🧠 AI-Assisted Issue Category Detection
+- 📍 AI-Assisted Location Detection
+- 💰 Estimated Resolution Cost Suggestion
+- 🗺️ Public Complaint / Map Visualization
+- 📊 Complaint Progress Tracking
+- ⭐ Citizen Feedback After Resolution
+
+---
+
+## 🎨 User Experience
+
+- ☀️ Light Mode
+- 🌙 Dark Mode
+- 📱 Mobile Responsive Design
+- 📲 Tablet Support
+- 💻 Desktop Support
+- ⏳ Professional Loading Animations
+- ✅ Form Validation
+- ⚠️ Error Handling
+- 🎯 Clean & User-Friendly Interface
+
+---
+
+# 🔄 Complaint Workflow
 
 ```text
-Thymeleaf UI
-     ↓
-Controllers
-     ↓
-Services / Business Logic
-     ↓
-Repositories / Spring Data JPA
-     ↓
-PostgreSQL
-```
-
----
-
-## 🛠️ Technology Stack
-
-| Category | Technology |
-|---|---|
-| Language | Java |
-| Framework | Spring Boot |
-| Web | Spring MVC |
-| Security | Spring Security |
-| ORM | JPA / Hibernate |
-| Database | PostgreSQL |
-| Template Engine | Thymeleaf |
-| Build Tool | Maven |
-| Boilerplate | Lombok |
-| Containerization | Docker |
-| Deployment | Render |
-| Version Control | Git & GitHub |
-
----
-
-## 📚 What I Learned
-
-- Building a complete Spring Boot web application
-- Designing Controller → Service → Repository architecture
-- Working with JPA / Hibernate and relational databases
-- Implementing authentication and authorization
-- DTOs, validation and exception handling
-- File and image upload management
-- Role-based access control
-- Responsive UI development
-- Smart / AI-assisted functionality
-- Dockerizing and deploying a Spring Boot application
-- Managing a real-world project with Git and GitHub
-
----
-
-## 🎓 Course & Acknowledgement
-
-This project was developed as part of the **Advanced Java** course.
-
-A special thanks to our course faculty **Asaduzzaman Noor Sir** for his continuous guidance, valuable feedback, and support throughout the course and project development.
-
----
-
-## 🚀 Try CityFix
-
-🌐 **Live Project:** https://cityfix-hmv8.onrender.com/
-
-💻 **GitHub Repository:** https://github.com/rabbi1067/cityFix
-
-Everyone is welcome to explore the application and test its features.
-
----
-
-<div align="center">
-
-### 🏙️ CityFix
-**Smarter City • Happier Citizens**
-
-Built with ❤️ using **Java & Spring Boot**
-
-[🌐 Live Project](https://cityfix-hmv8.onrender.com/) · [💻 GitHub Repository](https://github.com/rabbi1067/cityFix)
-
-</div>
+                    ┌──────────────────┐
+                    │     Citizen      │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    Register / Login
+                             │
+                             ▼
+                    Submit Complaint
+                             │
+                ┌────────────┼────────────┐
+                │            │            │
+                ▼            ▼            ▼
+             Details       Image       Location
+                │            │            │
+                └────────────┼────────────┘
+                             │
+                             ▼
+                    Complaint Submitted
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │      Admin       │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                       Review Issue
+                             │
+                             ▼
+                    Update Complaint
+                        Status
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+              ▼              ▼              ▼
+           Pending       In Progress      Rejected
+                             │
+                             ▼
+                          Resolved
+                             │
+                             ▼
+                    Resolution Details
+                             │
+                             ▼
+                    Citizen Rating &
+                         Feedback
