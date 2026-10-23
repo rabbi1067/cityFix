@@ -13,8 +13,8 @@ In Render, set these environment variables:
 
 | Variable | Value |
 | --- | --- |
-| `DB_URL` | `jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require` |
-| `DB_USERNAME` | `postgres.emlanhdksprgmkhpjhlq` |
+| `DB_URL` | Your Supabase JDBC URL, e.g. `jdbc:postgresql://YOUR_POOLER_HOST:5432/postgres?sslmode=require` |
+| `DB_USERNAME` | Your Supabase pooler username, e.g. `postgres.YOUR_PROJECT_REF` |
 | `DB_PASSWORD` | Your Supabase database password |
 | `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Your Cloudinary API key |
@@ -24,24 +24,28 @@ In Render, set these environment variables:
 
 The database URL must use the JDBC prefix. Username and password are separate
 variables; do not put them in the URL. No Supabase storage service key is needed.
+All three database variables are required. Source code, examples and the Render
+Blueprint contain no project-specific database URL, username or password. The
+Blueprint prompts for these values instead of assigning defaults.
 
 ## Fixing the old tenant/user error
 
-If the Render log mentions `postgres.gyeuqiijmzmumixgzqlg`, it is still using the
-previous Supabase project. The configured project in this version is
-`postgres.emlanhdksprgmkhpjhlq`.
+If the Render log mentions a tenant/user that does not match your current
+Supabase project's connection details, it is using stale configuration. Copy the
+host, port and username together from your project's **Connect > Session pooler**
+dialog. These values must belong to the same project as the password.
 
 On the existing Render service, open **Environment** and check both `DB_URL` /
 `DB_USERNAME` and `SPRING_DATASOURCE_URL` / `SPRING_DATASOURCE_USERNAME`, including
 linked environment groups. Remove stale overrides or replace them with the
-matching host and username from the table above. Set `DB_PASSWORD` to the matching
+matching host and username from your Supabase Connect dialog. Set `DB_PASSWORD` to the matching
 project's password. A `SPRING_DATASOURCE_PASSWORD` override must also be removed
 or updated if it exists. Then choose **Save, rebuild, and deploy**, or deploy the
 latest commit if there are no environment changes.
 
 Pushing this code does not update variables on an existing manually created
-Render service. With no database URL/username overrides, only `DB_PASSWORD` is
-required: the URL and username default to the supplied project.
+Render service. Set `DB_URL`, `DB_USERNAME` and `DB_PASSWORD` in Render Environment
+before deploying this version. There are no database defaults in the app.
 
 ## Deployment
 

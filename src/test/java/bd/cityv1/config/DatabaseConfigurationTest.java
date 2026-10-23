@@ -15,19 +15,25 @@ import static org.junit.jupiter.api.Assertions.*;
 class DatabaseConfigurationTest {
 
     @Test
-    void passwordAloneUsesTheSuppliedSupabaseProjectAndSessionPooler() throws IOException {
-        MockEnvironment environment = environment(Map.of("DB_PASSWORD", "test-password"));
-
-        assertEquals("jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require",
-                environment.getProperty("spring.datasource.url"));
-        assertEquals("postgres.emlanhdksprgmkhpjhlq",
-                environment.getProperty("spring.datasource.username"));
-        assertEquals("test-password", environment.getProperty("spring.datasource.password"));
-        assertFalse(environment.getProperty("spring.datasource.url").contains("password="));
+    void missingDatabaseVariablesCannotFallBackToAnotherProject() throws IOException {
+        Map<String, String> required = Map.of(
+                "DB_URL", "spring.datasource.url",
+                "DB_USERNAME", "spring.datasource.username",
+                "DB_PASSWORD", "spring.datasource.password");
+        for (var variable : required.entrySet()) {
+            Map<String, Object> configured = new java.util.HashMap<>(Map.of(
+                    "DB_URL", "jdbc:postgresql://localhost:5432/testdb",
+                    "DB_USERNAME", "test-user",
+                    "DB_PASSWORD", "test-password"));
+            configured.remove(variable.getKey());
+            MockEnvironment environment = environment(configured);
+            assertThrows(IllegalArgumentException.class,
+                    () -> environment.getProperty(variable.getValue()), variable.getKey() + " must be required");
+        }
     }
 
     @Test
-    void explicitDatabaseVariablesOverrideTheProjectDefaults() throws IOException {
+    void databaseConnectionValuesComeFromTheEnvironment() throws IOException {
         MockEnvironment environment = environment(Map.of(
                 "DB_URL", "jdbc:postgresql://localhost:5432/testdb",
                 "DB_USERNAME", "test-user",

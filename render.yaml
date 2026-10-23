@@ -7,9 +7,9 @@ services:
     dockerContext: .
     envVars:
       - key: DB_URL
-        value: jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require
+        sync: false
       - key: DB_USERNAME
-        value: postgres.emlanhdksprgmkhpjhlq
+        sync: false
       - key: DB_PASSWORD
         sync: false
       - key: CLOUDINARY_CLOUD_NAME
