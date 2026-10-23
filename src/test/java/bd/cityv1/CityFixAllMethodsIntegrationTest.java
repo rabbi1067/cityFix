@@ -635,12 +635,16 @@ class CityFixAllMethodsIntegrationTest {
 
     @Test
     void adminSeederShouldSkipExistingAdminAndCreateMissingAdmin() {
-        when(adminRepository.existsByEmail("admin@cityfix.com")).thenReturn(true);
-        assertDoesNotThrow(() -> adminSeeder.run());
+        var configuredSeeder = new bd.cityv1.admin.AdminSeeder(
+                adminRepository, passwordEncoder, "bootstrap@test.com", "bootstrap-test-password");
+        when(adminRepository.findByEmail("bootstrap@test.com")).thenReturn(Optional.of(admin));
+        when(passwordEncoder.matches("bootstrap-test-password", admin.getPassword())).thenReturn(true);
+        assertDoesNotThrow(() -> configuredSeeder.run());
+        verify(adminRepository, never()).save(any(Admin.class));
         reset(adminRepository);
-        when(adminRepository.existsByEmail("admin@cityfix.com")).thenReturn(false);
-        when(passwordEncoder.encode("Admin@123")).thenReturn("encoded");
-        assertDoesNotThrow(() -> adminSeeder.run("startup"));
+        when(adminRepository.findByEmail("bootstrap@test.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("bootstrap-test-password")).thenReturn("encoded");
+        assertDoesNotThrow(() -> configuredSeeder.run("startup"));
         verify(adminRepository).save(any(Admin.class));
     }
 

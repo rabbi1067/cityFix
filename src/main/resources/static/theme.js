@@ -5,7 +5,7 @@
 (function () {
     var STORAGE_KEY = 'cityfix-theme';
     var saved = localStorage.getItem(STORAGE_KEY);
-    var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var theme = saved === 'dark' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', theme);
 
     function wireToggles() {

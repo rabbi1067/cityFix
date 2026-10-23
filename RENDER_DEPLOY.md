@@ -16,6 +16,8 @@ In Render, set these environment variables:
 | `DB_URL` | Your Supabase JDBC URL, e.g. `jdbc:postgresql://YOUR_POOLER_HOST:5432/postgres?sslmode=require` |
 | `DB_USERNAME` | Your Supabase pooler username, e.g. `postgres.YOUR_PROJECT_REF` |
 | `DB_PASSWORD` | Your Supabase database password |
+| `SUPER_ADMIN_EMAIL` | The email address for your super admin account |
+| `SUPER_ADMIN_PASSWORD` | The password for that super admin account |
 | `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Your Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Your Cloudinary API secret |
@@ -27,6 +29,22 @@ variables; do not put them in the URL. No Supabase storage service key is needed
 All three database variables are required. Source code, examples and the Render
 Blueprint contain no project-specific database URL, username or password. The
 Blueprint prompts for these values instead of assigning defaults.
+
+## Super admin account
+
+Set `SUPER_ADMIN_EMAIL` and `SUPER_ADMIN_PASSWORD` in Render Environment. On
+startup, the app creates that admin if necessary, grants `SUPER_ADMIN`, and
+enables the account. For an existing admin with that email, it also synchronizes
+the password with the environment value. Only a password hash is stored in the
+database. No super admin password is embedded in source, the login page or logs.
+
+As long as these variables remain set, they reapply the configured access and
+password on startup. Update the environment password when changing this account's
+password, or remove both variables after provisioning to manage it only in the
+app. Supplying only one variable is a configuration error.
+
+The default theme is Day mode. An explicitly saved Night mode preference remains
+available through the day/night toggle.
 
 ## Fixing the old tenant/user error
 

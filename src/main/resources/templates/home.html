@@ -12,7 +12,7 @@
   <script>
     (function () {
       var saved = localStorage.getItem('cityfix-theme');
-      var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      var theme = saved === 'dark' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
