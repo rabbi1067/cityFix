@@ -8,6 +8,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.WebDataBinder;
 
 @Controller
 @RequiredArgsConstructor
@@ -15,12 +17,20 @@ public class RegisterController {
 
     private final CitizenService citizenService;
 
+    @InitBinder("citizen")
+    public void registrationFields(WebDataBinder binder) {
+        binder.setAllowedFields("name", "email", "phone", "nationalId", "gender", "occupation", "password",
+                "address.street", "address.city", "address.zipCode");
+    }
+
     @PostMapping("/register/save")
     public String register(@Valid @ModelAttribute("citizen") Citizen citizen,
                            BindingResult result,
-                           @RequestParam("confirmPassword") String confirmPassword,
+                           @RequestParam(value = "confirmPassword", defaultValue = "") String confirmPassword,
                            Model model) {
 
+        if (citizen.getAddress() == null) result.rejectValue("address", "required", "Address is required.");
+        if (citizen.getGender() == null) result.rejectValue("gender", "required", "Please select a gender.");
         if (result.hasErrors()) {
             return "register";
         }

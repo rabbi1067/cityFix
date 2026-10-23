@@ -13,6 +13,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import bd.cityv1.storage.ImageDelivery;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 public class AdminProfileController {
 
     private final AdminProfileService adminProfileService;
+    private final ImageDelivery imageDelivery;
 
     @GetMapping("/profile")
     public String profile(Model model, Authentication authentication) {
@@ -56,7 +60,24 @@ public class AdminProfileController {
         String errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        return ResponseEntity.badRequest().body(Map.of("error", errors));
+        Map<String, String> fields = ex.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage, (first, next) -> first));
+        return ResponseEntity.badRequest().body(Map.of("error", errors, "fields", fields));
+    }
+
+    @PostMapping("/profile/upload-avatar")
+    @ResponseBody
+    public ResponseEntity<?> uploadAvatar(@RequestParam("image") MultipartFile image,
+                                          Authentication authentication) throws IOException {
+        Admin updated = adminProfileService.updateAvatar(authentication.getName(), image);
+        return ResponseEntity.ok(Map.of("message", "Profile photo updated!",
+                "imagePath", imageDelivery.url(updated.getProfileImagePath(), 256)));
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<?> handleImageUploadFailure(IOException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of("error", "We couldn't upload your image. Please try again."));
     }
 
     @ExceptionHandler(RuntimeException.class)

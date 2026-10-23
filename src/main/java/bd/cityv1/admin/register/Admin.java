@@ -37,11 +37,13 @@ public class Admin {
 
     @NotBlank
     @Size(min = 6, message = "Password must be at least 6 characters")
+    @lombok.ToString.Exclude
     private String password;
 
     @Embedded
     private AdminContactInfo contactInfo = new AdminContactInfo();
 
+    @Column(length = 500)
     private String profileImagePath;
 
 

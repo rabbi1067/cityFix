@@ -36,7 +36,7 @@ public class AdminComplaintService {
         if (request.status() == null || request.priority() == null) {
             throw new IllegalArgumentException("Status and priority are required.");
         }
-        if (request.finalCost() != null && request.finalCost() < 0) {
+        if (request.finalCost() != null && (!Double.isFinite(request.finalCost()) || request.finalCost() < 0)) {
             throw new IllegalArgumentException("Final cost cannot be negative.");
         }
 

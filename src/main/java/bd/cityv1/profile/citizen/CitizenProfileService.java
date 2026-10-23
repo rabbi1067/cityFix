@@ -2,6 +2,7 @@ package bd.cityv1.profile.citizen;
 
 import bd.cityv1.citizen.register.Citizen;
 import bd.cityv1.citizen.register.CitizenRepository;
+import bd.cityv1.citizen.register.CitizenAddress;
 import bd.cityv1.profile.citizen.dto.UpdatePersonalInfoDto;
 import bd.cityv1.profile.common.ChangePasswordDto;
 import bd.cityv1.profile.common.PasswordChangeService;
@@ -26,16 +27,27 @@ public class CitizenProfileService {
                 .orElseThrow(() -> new RuntimeException("Citizen not found"));
     }
 
+    public boolean isPhoneTaken(String email, String phone) {
+        String normalized = bd.cityv1.validation.InputRules.phone(phone);
+        if (normalized == null || !normalized.matches(bd.cityv1.validation.InputRules.PHONE)) {
+            throw new IllegalArgumentException(bd.cityv1.validation.InputRules.PHONE_MESSAGE);
+        }
+        Citizen citizen = getCitizen(email);
+        return !java.util.Objects.equals(citizen.getPhone(), normalized)
+                && citizenRepository.existsByPhone(normalized);
+    }
+
     public Citizen updatePersonalInfo(String email, UpdatePersonalInfoDto dto) {
         Citizen citizen = getCitizen(email);
 
-        boolean phoneChanged = !citizen.getPhone().equals(dto.phone());
+        boolean phoneChanged = !java.util.Objects.equals(citizen.getPhone(), dto.phone());
         if (phoneChanged && citizenRepository.existsByPhone(dto.phone())) {
             throw new RuntimeException("Phone number already in use");
         }
 
         citizen.setName(dto.name());
         citizen.setPhone(dto.phone());
+        if (citizen.getAddress() == null) citizen.setAddress(new CitizenAddress());
         citizen.getAddress().setStreet(dto.street());
         citizen.getAddress().setCity(dto.city());
         citizen.getAddress().setZipCode(dto.zipCode());
@@ -51,18 +63,7 @@ public class CitizenProfileService {
 
     @Transactional(rollbackFor = IOException.class)
     public Citizen updateAvatar(String email, MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) {
-            throw new RuntimeException("Please select an image to upload");
-        }
-
-        String contentType = file.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
-            throw new RuntimeException("Only image files are allowed");
-        }
-
-        if (file.getSize() > 5 * 1024 * 1024) {
-            throw new RuntimeException("Image must be under 5MB");
-        }
+        bd.cityv1.storage.ProfileImageValidation.validate(file);
 
         Citizen citizen = getCitizen(email);
 

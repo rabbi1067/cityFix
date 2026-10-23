@@ -77,6 +77,8 @@ public class Complaint {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "citizen_id")
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private Citizen citizen;
 
     @Builder.Default
@@ -97,6 +99,8 @@ public class Complaint {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private ComplaintResolution resolution;
 
     public boolean hasImage() {

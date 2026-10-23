@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <script th:src="@{/theme.js}"></script>
+    <script th:src="@{/form-validation.js}" defer></script>
     <link rel="stylesheet" th:href="@{/theme-tokens.css}">
     <style>
         .register-loader {
@@ -42,6 +43,7 @@
             .register-form-area { padding: 24px 16px; }
         }
     </style>
+    <link rel="icon" type="image/png" th:href="@{/screen.png}">
 </head>
 <body class="bg-background font-body-md text-on-surface">
 <div id="registerPageLoader" class="register-loader" role="status" aria-live="polite" aria-label="Loading CityFix">
@@ -143,6 +145,10 @@
 
 
                     <form class="space-y-6" method="post" th:action="@{/register/save}" th:object="${citizen}">
+
+                        <ul th:if="${#fields.hasErrors('*')}" class="rounded-lg bg-error-container p-4 text-on-error-container" role="alert">
+                            <li th:each="message : ${#fields.allErrors()}" th:text="${message}"></li>
+                        </ul>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 

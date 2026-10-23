@@ -86,7 +86,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
     <script th:src="@{/theme.js}"></script>
+    <script th:src="@{/form-validation.js}" defer></script>
     <link rel="stylesheet" th:href="@{/theme-tokens.css}">
+    <link rel="icon" type="image/png" th:href="@{/screen.png}">
 </head>
 <body class="bg-surface font-body-md text-on-surface">
 <div id="cityfix-loader" class="cf-loader" role="status" aria-live="polite" aria-label="Loading complaints"><div class="cf-loader-orbit" aria-hidden="true"><div class="cf-loader-cube"><span></span><span></span><span></span><span></span><span></span><span></span></div></div><div class="cf-loader-copy"><strong>Loading your complaints</strong><span>Syncing your report history</span></div></div>
@@ -161,7 +163,7 @@
                     <img alt="Profile"
                          class="w-9 h-9 rounded-full object-cover border border-outline-variant shadow-sm"
                          id="header-avatar"
-                         th:src="${@imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
+                         th:src="${imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
                 </a>
                 <div th:if="${ratingSuccess != null}" id="ratingSuccessToast" class="rating-toast" role="status" aria-live="polite">
                     <span class="material-symbols-outlined text-green-400" aria-hidden="true">check_circle</span>
@@ -390,7 +392,7 @@
             <div class="mb-8" th:if="${complaint.hasImage()}">
                 <p class="font-label-md text-label-md text-on-surface-variant mb-2">Visual Evidence</p>
                 <div class="flex justify-center">
-                    <img th:src="${@imageDelivery.url(complaint.imageUrl, 1200)}" alt="Complaint evidence" loading="lazy" decoding="async"
+                    <img th:src="${imageDelivery.url(complaint.imageUrl, 1200)}" alt="Complaint evidence" loading="lazy" decoding="async"
                           class="block max-w-full max-h-[62vh] w-auto h-auto object-contain rounded-xl border border-outline-variant shadow-sm">
                 </div>
             </div>
@@ -409,7 +411,7 @@
                     <h2 th:id="'resolution-feedback-title-' + ${complaint.id}" class="font-title-md text-on-surface">After Resolved</h2>
                 </div>
                 <div class="flex justify-center rounded-xl bg-surface-container-low p-3">
-                    <img th:src="${@imageDelivery.url(complaint.resolution.resolutionImageUrl, 1200)}" alt="After resolved evidence" loading="lazy" decoding="async"
+                    <img th:src="${imageDelivery.url(complaint.resolution.resolutionImageUrl, 1200)}" alt="After resolved evidence" loading="lazy" decoding="async"
                          class="block max-w-full max-h-[52vh] w-auto h-auto object-contain rounded-xl border border-outline-variant shadow-sm">
                 </div>
                 <div class="mt-5 rounded-xl bg-surface-container-lowest border border-outline-variant/40 p-4">
@@ -510,15 +512,12 @@
     (function () {
         const email = /*[[${citizen.email}]]*/ '';
         const nameKey = 'cityfix-profile-name-' + email;
-        const avatarKey = 'cityfix-avatar-' + email;
         const applyProfile = () => {
             const name = localStorage.getItem(nameKey);
-            const avatar = localStorage.getItem(avatarKey);
             if (name) document.querySelectorAll('#header-name').forEach(el => el.textContent = name);
-            if (avatar) document.querySelectorAll('#header-avatar').forEach(el => el.src = avatar);
         };
         applyProfile();
-        window.addEventListener('storage', event => { if (event.key === nameKey || event.key === avatarKey) applyProfile(); });
+        window.addEventListener('storage', event => { if (event.key === nameKey) applyProfile(); });
         window.addEventListener('cityfix-profile-updated', applyProfile);
     })();
 </script>

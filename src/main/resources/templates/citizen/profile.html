@@ -41,7 +41,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
     <script th:src="@{/theme.js}"></script>
+    <script th:src="@{/form-validation.js}" defer></script>
+    <script th:src="@{/profile-avatar.js}" defer></script>
     <link rel="stylesheet" th:href="@{/theme-tokens.css}">
+    <link rel="icon" type="image/png" th:href="@{/screen.png}">
 </head>
 <body class="bg-surface font-body-md text-on-surface">
 <div id="cityfix-loader" class="cf-loader" role="status" aria-live="polite" aria-label="Loading profile"><div class="cf-loader-orbit" aria-hidden="true"><div class="cf-loader-cube"><span></span><span></span><span></span><span></span><span></span><span></span></div></div><div class="cf-loader-copy"><strong>Preparing your profile</strong><span>Syncing your account details</span></div></div>
@@ -92,7 +95,7 @@
                     <p class="text-label-sm text-on-surface-variant">Citizen User</p>
                 </span>
                 <img alt="Profile" class="w-9 h-9 rounded-full object-cover border border-outline-variant shadow-sm" id="header-avatar"
-                     th:src="${@imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
+                     th:src="${imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
             </a>
         </div>
     </header>
@@ -108,11 +111,11 @@
                     <div class="relative group" id="avatar-container">
                         <div class="absolute inset-0 bg-primary/20 rounded-full blur-lg scale-90 group-hover:scale-110 transition-transform duration-500"></div>
                         <img alt="Profile" class="relative w-32 h-32 rounded-full object-cover shadow-xl border-4 border-surface-container-lowest" id="hero-avatar"
-                             th:src="${@imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
+                             th:src="${imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
                         <label for="avatar-input" class="absolute bottom-0 right-0 p-2 bg-primary text-on-primary rounded-full shadow-lg hover:scale-110 transition-transform cursor-pointer z-10">
                             <span class="material-symbols-outlined text-[18px]">photo_camera</span>
                         </label>
-                        <input type="file" id="avatar-input" accept="image/*" class="hidden">
+                        <input type="file" id="avatar-input" data-upload-url="/citizen/profile/upload-avatar" accept="image/jpeg,image/png,image/webp" class="hidden">
                         <!-- Small inline status while a photo is being compressed/saved -->
                         <div id="avatar-status" class="hidden absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
                             <span class="material-symbols-outlined text-white animate-spin text-[28px]">progress_activity</span>
@@ -466,105 +469,6 @@
         });
 
         /* AVATAR UPLOAD */
-        const avatarInput = document.getElementById('avatar-input');
-        const heroAvatar = document.getElementById('hero-avatar');
-        const headerAvatar = document.getElementById('header-avatar');
-        const avatarStatus = document.getElementById('avatar-status');
-
-        // Creates a lightweight local preview while the original file is uploaded.
-        function compressImageToDataUrl(file, maxDimension, quality) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onerror = () => reject(new Error('Could not read the file.'));
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onerror = () => reject(new Error('Could not decode that image.'));
-                    img.onload = () => {
-                        let { width, height } = img;
-
-                        if (width > height && width > maxDimension) {
-                            height = Math.round(height * (maxDimension / width));
-                            width = maxDimension;
-                        } else if (height >= width && height > maxDimension) {
-                            width = Math.round(width * (maxDimension / height));
-                            height = maxDimension;
-                        }
-
-                        const canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        avatarInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            if (!file.type.startsWith('image/')) {
-                showToast('avatar-toast', 'Please select a valid image file.', true);
-                avatarInput.value = '';
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('avatar-toast', 'Image must be under 5MB.', true);
-                avatarInput.value = '';
-                return;
-            }
-
-            avatarStatus.classList.remove('hidden');
-
-            try {
-                // Show an immediate preview before the upload completes.
-                const previewDataUrl = await compressImageToDataUrl(file, 320, 0.75);
-                heroAvatar.src = previewDataUrl;
-                headerAvatar.src = previewDataUrl;
-
-                const formData = new FormData();
-                formData.append('image', file);
-
-                const response = await fetch('/citizen/profile/upload-avatar', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Could not upload profile photo.');
-                }
-
-                if (data.imagePath) {
-                    // Each uploaded image has a unique URL that can be cached by the CDN.
-                    heroAvatar.src = data.imagePath;
-                    headerAvatar.src = data.imagePath;
-                }
-
-                window.cityfixPublishProfile?.(null, headerAvatar.src);
-                showToast(
-                    'avatar-toast',
-                    data.message || 'Profile photo updated successfully!'
-                );
-            } catch (error) {
-                showToast(
-                    'avatar-toast',
-                    error.message || 'Could not upload profile photo. Please try again.',
-                    true
-                );
-            } finally {
-                avatarStatus.classList.add('hidden');
-                avatarInput.value = '';
-            }
-        });
-
         /* PERSONAL INFO: EDIT / VIEW MODE TOGGLE */
         const editBtn = document.getElementById('edit-personal-btn');
         const editIcon = document.getElementById('edit-personal-icon');
@@ -975,19 +879,17 @@
     (function () {
         const email = /*[[${citizen.email}]]*/ '';
         const nameKey = 'cityfix-profile-name-' + email;
-        const avatarKey = 'cityfix-avatar-' + email;
         const apply = (name, avatar) => {
             if (name) ['header-name','hero-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = name; });
             if (avatar) ['header-avatar','hero-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = avatar; });
         };
         window.cityfixPublishProfile = (name, avatar) => {
             if (name) localStorage.setItem(nameKey, name);
-            if (avatar) localStorage.setItem(avatarKey, avatar);
             apply(name, avatar);
             window.dispatchEvent(new CustomEvent('cityfix-profile-updated', { detail: { name, avatar } }));
         };
-        apply(localStorage.getItem(nameKey), localStorage.getItem(avatarKey));
-        window.addEventListener('storage', event => { if (event.key === nameKey || event.key === avatarKey) apply(localStorage.getItem(nameKey), localStorage.getItem(avatarKey)); });
+        apply(localStorage.getItem(nameKey), null);
+        window.addEventListener('storage', event => { if (event.key === nameKey) apply(localStorage.getItem(nameKey), null); });
         const toggle = document.getElementById('mobile-nav-toggle'), sidebar = document.querySelector('.cf-sidebar'), backdrop = document.getElementById('mobile-nav-backdrop');
         const closeNav = () => { sidebar?.classList.remove('cf-sidebar-open'); backdrop?.classList.remove('is-visible'); toggle?.setAttribute('aria-expanded','false'); if (toggle) toggle.querySelector('.material-symbols-outlined').textContent='menu'; };
         toggle?.addEventListener('click', () => { const open = !sidebar?.classList.contains('cf-sidebar-open'); sidebar?.classList.toggle('cf-sidebar-open', open); backdrop?.classList.toggle('is-visible', open); toggle?.setAttribute('aria-expanded', String(open)); if (toggle) toggle.querySelector('.material-symbols-outlined').textContent=open?'close':'menu'; });

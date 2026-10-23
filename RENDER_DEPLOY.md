@@ -1,7 +1,7 @@
 # Deploy CityFix on Render
 
-The application uses Supabase only for Postgres. New complaint, resolution and
-profile images are uploaded to Cloudinary. Only their HTTPS URLs are stored in
+The application uses Supabase only for Postgres. New complaint, resolution,
+admin profile and citizen profile images are uploaded to Cloudinary. Only their HTTPS URLs are stored in
 Postgres; there are no new image blobs or local upload files.
 
 ## Required configuration
@@ -91,6 +91,9 @@ CDN. The original URL remains in Postgres. Existing Supabase image URLs continue
 to display; old images are not automatically migrated or deleted.
 Existing `/uploads/...` avatar paths still depend on their original local files;
 upload those avatars again to move them to Cloudinary before relying on Render.
+Existing admin photos saved only in a browser also need to be uploaded again.
+New profile uploads use a shared server flow with JPG/PNG/WEBP validation and a
+5 MB limit. Both profiles load their saved URLs from the database on every page.
 
 Replacement images are uploaded before old images are removed. Old Cloudinary
 images are removed only after a successful database commit. Failed database

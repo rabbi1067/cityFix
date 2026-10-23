@@ -53,6 +53,7 @@ public class CitizenAdminController {
                            Authentication authentication) {
 
         if (result.hasErrors()) {
+            model.addAttribute("showAddCitizen", true);
             return manageUsers(model, authentication);
         }
 
@@ -61,6 +62,7 @@ public class CitizenAdminController {
         } catch (IllegalArgumentException e) {
             String[] parts = e.getMessage().split(":", 2);
             result.rejectValue(parts[0], "error", parts[1]);
+            model.addAttribute("showAddCitizen", true);
             return manageUsers(model, authentication);
         }
 
@@ -74,8 +76,24 @@ public class CitizenAdminController {
     }
 
     @PostMapping("/users/{id}/edit")
-    public String updateUser(@PathVariable Long id, @ModelAttribute UpdateCitizenRequest request) {
-        citizenAdminService.updateCitizen(id, request);
+    public String updateUser(@PathVariable Long id,
+                             @Valid @ModelAttribute("editedCitizen") UpdateCitizenRequest request,
+                             BindingResult result, Model model, Authentication authentication) {
+        if (!result.hasErrors()) {
+            try {
+                citizenAdminService.updateCitizen(id, request);
+            } catch (IllegalArgumentException ex) {
+                String[] parts = ex.getMessage().split(":", 2);
+                if (parts.length == 2 && "phone".equals(parts[0])) result.rejectValue("phone", "duplicate", parts[1]);
+                else result.reject("update", "The citizen could not be updated. Please refresh and try again.");
+            }
+        }
+        if (result.hasErrors()) {
+            model.addAttribute("editCitizenId", id);
+            model.addAttribute("editErrors", result.getAllErrors().stream()
+                    .map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage).toList());
+            return manageUsers(model, authentication);
+        }
         return "redirect:/admin/users";
     }
 }

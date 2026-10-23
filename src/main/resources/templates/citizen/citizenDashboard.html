@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
   <script th:src="@{/theme.js}"></script>
+    <script th:src="@{/form-validation.js}" defer></script>
   <link rel="stylesheet" th:href="@{/theme-tokens.css}">
   <style>
     /* Citizen settings switch state: keeps the existing Admin Dashboard switch appearance. */
@@ -135,6 +136,7 @@
       .cf-topbar-actions > a { gap: 8px !important; padding-left: 12px !important; }
     }
   </style>
+    <link rel="icon" type="image/png" th:href="@{/screen.png}">
 </head>
 <body class="bg-surface font-body-md text-on-surface">
 
@@ -218,7 +220,7 @@
 
 <div class="cf-page-shell pl-sidebar-width">
   <!-- Search bar removed. Header now just shows the logged-in citizen's name + avatar (kept in sync with the
-       localStorage-based avatar preview from the Profile page, same as my-complaints.html / profile.html) -->
+       the saved Cloudinary profile image from the database) -->
   <header class="cf-topbar fixed top-0 left-sidebar-width right-0 h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant z-40 flex items-center justify-between px-margin-desktop">
     <button id="mobile-nav-toggle" type="button" class="cf-mobile-menu-btn" aria-label="Open navigation" aria-expanded="false"><span class="material-symbols-outlined">menu</span></button>
     <div class="cf-topbar-actions flex items-center gap-6">
@@ -252,7 +254,7 @@
           <p class="text-label-sm text-on-surface-variant">Citizen User</p>
         </span>
         <img alt="Profile" class="w-9 h-9 rounded-full object-cover border border-outline-variant shadow-sm" id="header-avatar"
-             th:src="${@imageDelivery.url(citizen?.profileImagePath ?: '/profile1.jpg', 256)}">
+             th:src="${imageDelivery.url(citizen?.profileImagePath ?: '/profile1.jpg', 256)}">
       </a>
     </div>
   </header>
@@ -681,15 +683,12 @@
     (function () {
       const email = /*[[${citizen?.email ?: ''}]]*/ '';
       const nameKey = 'cityfix-profile-name-' + email;
-      const avatarKey = 'cityfix-avatar-' + email;
       const applyProfile = () => {
         const name = localStorage.getItem(nameKey);
-        const avatar = localStorage.getItem(avatarKey);
         if (name) document.querySelectorAll('#header-name, #welcome-name').forEach(el => el.textContent = name);
-        if (avatar) document.querySelectorAll('#header-avatar').forEach(el => el.src = avatar);
       };
       applyProfile();
-      window.addEventListener('storage', event => { if (event.key === nameKey || event.key === avatarKey) applyProfile(); });
+      window.addEventListener('storage', event => { if (event.key === nameKey) applyProfile(); });
       window.addEventListener('cityfix-profile-updated', applyProfile);
     })();
 

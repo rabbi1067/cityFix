@@ -9,6 +9,9 @@ import bd.cityv1.complaint.admin.dto.ResolveComplaintRequest;
 import bd.cityv1.complaint.citizen.dto.CreateComplaintRequest;
 import bd.cityv1.complaint.common.*;
 import bd.cityv1.profile.citizen.CitizenProfileService;
+import bd.cityv1.profile.admin.AdminProfileService;
+import bd.cityv1.admin.register.Admin;
+import bd.cityv1.admin.register.AdminRepository;
 import bd.cityv1.profile.common.PasswordChangeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
@@ -105,5 +108,36 @@ class CloudinaryImageWorkflowTest {
         resolution.setResolutionImageUrl("old-photo");
         complaint.setResolution(resolution);
         return complaint;
+    }
+
+    @Test
+    void savesAdminAvatarUrlAndSchedulesPreviousImageCleanup() throws Exception {
+        AdminRepository admins = mock(AdminRepository.class);
+        Admin admin = new Admin();
+        admin.setProfileImagePath("old-avatar-url");
+        when(admins.findByEmail("admin@example.com")).thenReturn(Optional.of(admin));
+        when(admins.save(admin)).thenReturn(admin);
+        when(storage.upload(image, "avatars")).thenReturn("https://res.cloudinary.com/demo/new-avatar.png");
+        AdminProfileService service = new AdminProfileService(admins, mock(PasswordChangeService.class), storage);
+
+        assertEquals("https://res.cloudinary.com/demo/new-avatar.png",
+                service.updateAvatar("admin@example.com", image).getProfileImagePath());
+        verify(storage).deleteAfterCommit("old-avatar-url");
+        verify(admins).save(admin);
+    }
+
+    @Test
+    void failedAdminAvatarUploadKeepsThePreviousUrl() throws Exception {
+        AdminRepository admins = mock(AdminRepository.class);
+        Admin admin = new Admin();
+        admin.setProfileImagePath("old-avatar-url");
+        when(admins.findByEmail("admin@example.com")).thenReturn(Optional.of(admin));
+        when(storage.upload(image, "avatars")).thenThrow(new IOException("Offline"));
+        AdminProfileService service = new AdminProfileService(admins, mock(PasswordChangeService.class), storage);
+
+        assertThrows(IOException.class, () -> service.updateAvatar("admin@example.com", image));
+        assertEquals("old-avatar-url", admin.getProfileImagePath());
+        verify(admins, never()).save(any());
+        verify(storage, never()).deleteAfterCommit(any());
     }
 }

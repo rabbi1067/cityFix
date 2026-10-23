@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
     <script th:src="@{/theme.js}"></script>
+    <script th:src="@{/form-validation.js}" defer></script>
     <link rel="stylesheet" th:href="@{/theme-tokens.css}">
     <style>
         /* Live map chrome - pulsing "LIVE" indicator + marker ping animation.
@@ -106,6 +107,7 @@
         @media (prefers-reduced-motion: reduce) { .cf-loader-cube,.cf-loader-orbit::before,.cf-loader-orbit::after { animation:none; } .cf-loader { transition:none; } }
 
     </style>
+    <link rel="icon" type="image/png" th:href="@{/screen.png}">
 </head>
 <body class="bg-surface font-body-md text-on-surface">
 <div id="cityfix-loader" class="cf-loader" role="status" aria-live="polite" aria-label="Loading admin dashboard"><div class="cf-loader-orbit" aria-hidden="true"><div class="cf-loader-cube"><span></span><span></span><span></span><span></span><span></span><span></span></div></div><div class="cf-loader-copy"><strong>Preparing operations dashboard</strong><span>Syncing live city data</span></div></div>
@@ -206,7 +208,7 @@
                     <p class="text-label-sm text-on-surface-variant">Administrator</p>
                 </span>
                 <img alt="Profile" class="w-9 h-9 rounded-full object-cover border border-outline-variant shadow-sm" id="header-avatar"
-                     th:src="@{${admin.profileImagePath != null ? admin.profileImagePath : '/profile1.jpg'}}">
+                     th:src="${imageDelivery.url(admin.profileImagePath != null ? admin.profileImagePath : '/profile1.jpg', 256)}">
             </a>
         </div>
     </header>
@@ -528,11 +530,6 @@
      (that upload is only saved to this browser's localStorage, not the server) -->
 <script th:inline="javascript">
     (function () {
-        const avatarKey = 'cityfix-avatar-' + /*[[${admin.email}]]*/ '';
-        const savedAvatar = localStorage.getItem(avatarKey);
-        if (savedAvatar) {
-            document.getElementById('header-avatar').src = savedAvatar;
-        }
     })();
 </script>
 

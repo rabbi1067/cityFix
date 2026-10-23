@@ -20,6 +20,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.List;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 
 @Controller
 @RequestMapping("/admin")
@@ -65,14 +67,17 @@ public class AdminComplaintController {
 
     @PostMapping("/complaints/{id}/edit")
     public String updateComplaint(@PathVariable Long id,
-                                  @RequestParam Status status,
-                                  @RequestParam Priority priority,
-                                  @RequestParam(required = false) Double finalCost,
-                                  @RequestParam(required = false) String costNotes,
+                                  @Valid @ModelAttribute ResolveComplaintRequest request,
+                                  BindingResult result,
                                   @RequestParam(required = false) MultipartFile resolutionImage,
                                   RedirectAttributes redirectAttributes) throws IOException {
 
-        ResolveComplaintRequest request = new ResolveComplaintRequest(status, priority, finalCost, costNotes);
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("resolutionError", result.getAllErrors().stream()
+                    .map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(java.util.stream.Collectors.joining(" ")));
+            return "redirect:/admin/complaints/" + id + "/view";
+        }
 
         try {
             adminComplaintService.resolveOrUpdateComplaint(id, request, resolutionImage);

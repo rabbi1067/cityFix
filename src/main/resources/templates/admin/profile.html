@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
     <script th:src="@{/theme.js}"></script>
+    <script th:src="@{/form-validation.js}" defer></script>
+    <script th:src="@{/profile-avatar.js}" defer></script>
     <link rel="stylesheet" th:href="@{/theme-tokens.css}">
     <style>
         .field-help, .field-error { font-size: 12px; line-height: 1.35; margin: 0.1rem 0.25rem 0; }
@@ -49,6 +51,7 @@
         }
         @media (prefers-reduced-motion:reduce) { .cf-profile-loader-spinner { animation:none; } .cf-profile-loader { transition:none; } }
     </style>
+    <link rel="icon" type="image/png" th:href="@{/screen.png}">
 </head>
 <body class="bg-surface font-body-md text-on-surface">
 <div id="cf-profile-loader" class="cf-profile-loader" role="status" aria-live="polite" aria-label="Loading profile"><div class="cf-profile-loader-spinner" aria-hidden="true"></div><div class="cf-profile-loader-copy">Preparing profile<span>Loading administrator settings</span></div></div>
@@ -115,7 +118,7 @@
                     <p class="text-label-sm text-on-surface-variant">Administrator</p>
                 </span>
                 <img alt="Profile" class="w-9 h-9 rounded-full object-cover border border-outline-variant shadow-sm" id="header-avatar"
-                     th:src="@{${admin.profileImagePath != null ? admin.profileImagePath : '/profile1.jpg'}}">
+                     th:src="${imageDelivery.url(admin.profileImagePath != null ? admin.profileImagePath : '/profile1.jpg', 256)}">
             </a>
         </div>
     </header>
@@ -132,12 +135,12 @@
                     <div class="relative group" id="avatar-container">
                         <div class="w-40 h-40 rounded-full p-1 bg-gradient-to-tr from-primary to-secondary-container shadow-xl">
                             <img alt="Admin" class="w-full h-full rounded-full object-cover border-4 border-surface-container-lowest" id="hero-avatar"
-                                 th:src="@{${admin.profileImagePath != null ? admin.profileImagePath : '/profile1.jpg'}}">
+                                 th:src="${imageDelivery.url(admin.profileImagePath != null ? admin.profileImagePath : '/profile1.jpg', 256)}">
                         </div>
                         <label for="avatar-input" class="absolute bottom-1 right-1 p-2 bg-primary text-on-primary rounded-full shadow-lg hover:scale-110 transition-transform cursor-pointer z-10">
                             <span class="material-symbols-outlined text-[18px]">photo_camera</span>
                         </label>
-                        <input type="file" id="avatar-input" accept="image/*" class="hidden">
+                        <input type="file" id="avatar-input" data-upload-url="/admin/profile/upload-avatar" accept="image/jpeg,image/png,image/webp" class="hidden">
                         <!-- Small inline status while a photo is being compressed/saved -->
                         <div id="avatar-status" class="hidden absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
                             <span class="material-symbols-outlined text-white animate-spin text-[28px]">progress_activity</span>
@@ -351,91 +354,7 @@
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', () => {
 
-        /* AVATAR (stored in this browser only, keyed per admin, survives logout/login) */
-        const avatarInput = document.getElementById('avatar-input');
-        const heroAvatar = document.getElementById('hero-avatar');
-        const headerAvatar = document.getElementById('header-avatar');
-        const avatarStatus = document.getElementById('avatar-status');
-        const avatarKey = 'cityfix-avatar-' + /*[[${admin.email}]]*/ '';
-
-        const savedAvatar = localStorage.getItem(avatarKey);
-        if (savedAvatar) {
-            heroAvatar.src = savedAvatar;
-            headerAvatar.src = savedAvatar;
-        }
-
-        // Resizes + re-encodes the picked image as a small JPEG before it's stored.
-        // Raw photos (often several MB) blow past localStorage's ~5-10MB quota once
-        // base64-encoded, which made setItem() silently fail before. A compressed
-        // 320px-wide JPEG is typically only a few tens of KB, well inside the limit.
-        function compressImageToDataUrl(file, maxDimension, quality) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onerror = () => reject(new Error('Could not read the file.'));
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onerror = () => reject(new Error('Could not decode that image.'));
-                    img.onload = () => {
-                        let { width, height } = img;
-                        if (width > height && width > maxDimension) {
-                            height = Math.round(height * (maxDimension / width));
-                            width = maxDimension;
-                        } else if (height >= width && height > maxDimension) {
-                            width = Math.round(width * (maxDimension / height));
-                            height = maxDimension;
-                        }
-                        const canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        avatarInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (!file.type.startsWith('image/')) {
-                showToast('avatar-toast', 'Please select a valid image file.', true);
-                avatarInput.value = '';
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('avatar-toast', 'Image must be under 5MB.', true);
-                avatarInput.value = '';
-                return;
-            }
-
-            avatarStatus.classList.remove('hidden');
-
-            compressImageToDataUrl(file, 320, 0.75)
-                .then((dataUrl) => {
-                    heroAvatar.src = dataUrl;
-                    headerAvatar.src = dataUrl;
-                    try {
-                        localStorage.setItem(avatarKey, dataUrl);
-                    } catch (err) {
-                        // Still shouldn't happen post-compression, but if the browser's
-                        // storage is completely full or blocked (private mode etc.),
-                        // say so instead of failing silently like before.
-                        showToast('avatar-toast', 'Could not save the photo. It will only show for this session.', true);
-                    }
-                    showToast('avatar-toast', 'Profile photo updated successfully!');
-                })
-                .catch((err) => {
-                    showToast('avatar-toast', err.message || 'Could not process that image. Please try another file.', true);
-                })
-                .finally(() => {
-                    avatarStatus.classList.add('hidden');
-                    avatarInput.value = '';
-                });
-        });
-
+        /* Profile photo upload is handled by profile-avatar.js. */
         /* PERSONAL INFO: EDIT / VIEW MODE TOGGLE (email always stays disabled) */
         const editBtn = document.getElementById('edit-personal-btn');
         const editIcon = document.getElementById('edit-personal-icon');

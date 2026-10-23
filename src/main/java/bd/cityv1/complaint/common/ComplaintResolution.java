@@ -36,6 +36,8 @@ public class ComplaintResolution {
             nullable = false,
             unique = true
     )
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private Complaint complaint;
 
     private LocalDateTime resolvedAt;

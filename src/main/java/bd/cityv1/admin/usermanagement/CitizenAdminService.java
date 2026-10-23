@@ -62,6 +62,11 @@ public class CitizenAdminService {
         Citizen citizen = citizenRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Citizen not found with id: " + id));
 
+        if (!java.util.Objects.equals(citizen.getPhone(), request.getPhone())
+                && citizenRepository.existsByPhone(request.getPhone())) {
+            throw new IllegalArgumentException("phone:This phone number is already registered.");
+        }
+
         citizen.setName(request.getName());
         citizen.setPhone(request.getPhone());
         citizen.setNationalId(request.getNationalId());

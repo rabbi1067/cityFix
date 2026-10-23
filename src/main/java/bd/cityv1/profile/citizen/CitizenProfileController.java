@@ -47,6 +47,12 @@ public class CitizenProfileController {
         ));
     }
 
+    @GetMapping("/profile/check-phone")
+    @ResponseBody
+    public ResponseEntity<?> checkPhone(@RequestParam String phone, Authentication authentication) {
+        return ResponseEntity.ok(Map.of("exists", citizenProfileService.isPhoneTaken(authentication.getName(), phone)));
+    }
+
     @PostMapping("/profile/change-password")
     @ResponseBody
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordDto dto,
@@ -71,7 +77,9 @@ public class CitizenProfileController {
         String errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        return ResponseEntity.badRequest().body(Map.of("error", errors));
+        Map<String, String> fields = ex.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage, (first, next) -> first));
+        return ResponseEntity.badRequest().body(Map.of("error", errors, "fields", fields));
     }
 
     @ExceptionHandler(RuntimeException.class)

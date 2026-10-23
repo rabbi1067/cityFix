@@ -438,7 +438,10 @@ class CityFixAllMethodsIntegrationTest {
         assertEquals("redirect:/admin/users", citizenAdminController.saveUser(request, result, model, auth("admin@test.com")));
         assertEquals("manage-users", model.getAttribute("activePage"));
         assertEquals("redirect:/admin/users", citizenAdminController.deleteUser(10L));
-        assertEquals("redirect:/admin/users", citizenAdminController.updateUser(10L, new UpdateCitizenRequest()));
+        UpdateCitizenRequest editRequest = new UpdateCitizenRequest();
+        assertEquals("redirect:/admin/users", citizenAdminController.updateUser(10L, editRequest,
+                new org.springframework.validation.BeanPropertyBindingResult(editRequest, "editedCitizen"),
+                new org.springframework.ui.ExtendedModelMap(), auth("admin@test.com")));
     }
 
     @Test
@@ -686,7 +689,7 @@ class CityFixAllMethodsIntegrationTest {
         MultipartFile empty = mock(MultipartFile.class); when(empty.isEmpty()).thenReturn(true);
         assertEquals("Please select an image to upload", assertThrows(RuntimeException.class, () -> citizenProfileService.updateAvatar("citizen@test.com", empty)).getMessage());
         MultipartFile text = mock(MultipartFile.class); when(text.isEmpty()).thenReturn(false); when(text.getContentType()).thenReturn("text/plain");
-        assertEquals("Only image files are allowed", assertThrows(RuntimeException.class, () -> citizenProfileService.updateAvatar("citizen@test.com", text)).getMessage());
+        assertEquals("Only JPG, PNG, or WEBP images are allowed.", assertThrows(RuntimeException.class, () -> citizenProfileService.updateAvatar("citizen@test.com", text)).getMessage());
         MultipartFile large = mock(MultipartFile.class); when(large.isEmpty()).thenReturn(false); when(large.getContentType()).thenReturn("image/png"); when(large.getSize()).thenReturn(5L * 1024 * 1024 + 1);
         assertEquals("Image must be under 5MB", assertThrows(RuntimeException.class, () -> citizenProfileService.updateAvatar("citizen@test.com", large)).getMessage());
     }

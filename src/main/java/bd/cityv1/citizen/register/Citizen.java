@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
+import bd.cityv1.validation.InputRules;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,14 +33,17 @@ public class Citizen {
     private String citizenId;
 
     @NotBlank
+    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters.")
     private String name;
 
     @Column(unique = true, nullable = false)
     @NotBlank
+    @Pattern(regexp = InputRules.PHONE, message = InputRules.PHONE_MESSAGE)
     private String phone;
 
     @Email
     @NotBlank
+    @Size(max = 254, message = "Email must be at most 254 characters.")
     private String email;
 
     private String nationalId;
@@ -48,16 +54,20 @@ public class Citizen {
     private String occupation;
 
     @Embedded
+    @Valid
     private CitizenAddress address;
 
     @NotBlank
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @Size(min = 6, max = 72, message = "Password must be between 6 and 72 characters")
+    @lombok.ToString.Exclude
     private String password;
 
     @jakarta.persistence.Column(length = 500)
     private String profileImagePath;
 
     @OneToMany(mappedBy = "citizen", cascade = CascadeType.ALL)
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
     private List<Complaint> complaints = new ArrayList<>();
 
     private LocalDateTime createdAt = LocalDateTime.now();
