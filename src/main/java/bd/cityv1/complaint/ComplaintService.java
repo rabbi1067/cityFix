@@ -5,7 +5,7 @@ import bd.cityv1.complaint.citizen.dto.CreateComplaintRequest;
 import bd.cityv1.complaint.common.Complaint;
 import bd.cityv1.complaint.common.ComplaintRepository;
 import bd.cityv1.complaint.common.Status;
-import bd.cityv1.storage.SupabaseStorageService;
+import bd.cityv1.storage.CloudinaryStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +22,9 @@ public class ComplaintService {
 
     private final ComplaintRepository complaintRepository;
     private final CostEstimationService costEstimationService;
-    private final SupabaseStorageService storageService;   // নতুন import: bd.cityv1.storage.SupabaseStorageService
+    private final CloudinaryStorageService storageService;
 
-    @Transactional
+    @Transactional(rollbackFor = IOException.class)
     public Complaint saveComplaint(CreateComplaintRequest dto, Citizen citizen, MultipartFile file) throws IOException {
         Complaint complaint = new Complaint();
         complaint.setTitle(dto.getTitle());

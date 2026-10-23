@@ -91,12 +91,15 @@ PostgreSQL
 | Security | Spring Security |
 | ORM | JPA / Hibernate |
 | Database | PostgreSQL |
+| Image Storage / CDN | Cloudinary |
 | Template Engine | Thymeleaf |
 | Build Tool | Maven |
 | Boilerplate | Lombok |
 | Containerization | Docker |
 | Deployment | Render |
 | Version Control | Git & GitHub |
+
+For Render environment variables and deployment steps, see [RENDER_DEPLOY.md](RENDER_DEPLOY.md).
 
 ---
 

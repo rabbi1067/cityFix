@@ -54,7 +54,15 @@ public class CreateComplaintController {
             return "citizen/createComplaints";
         }
 
-        complaintService.saveComplaint(dto, citizen, file);
+        try {
+            complaintService.saveComplaint(dto, citizen, file);
+        } catch (IOException | IllegalArgumentException ex) {
+            model.addAttribute("citizen", citizen);
+            model.addAttribute("activePage", "create-complaint");
+            model.addAttribute("uploadError", ex instanceof IOException
+                    ? "We couldn't upload your image. Please try again." : ex.getMessage());
+            return "citizen/createComplaints";
+        }
 
         return "redirect:/citizen/create-complaint?success=true";
     }

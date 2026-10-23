@@ -731,7 +731,7 @@
                         <div class="mb-8" th:if="${complaint.hasImage()}">
                             <p class="font-label-md text-label-md text-on-surface-variant mb-2">Visual Evidence (Before)</p>
                             <div class="flex justify-center rounded-xl bg-surface-container-low p-3">
-                                <img th:src="${complaint.imageUrl}" alt="Complaint evidence"
+                                <img th:src="${@imageDelivery.url(complaint.imageUrl, 1200)}" alt="Complaint evidence" loading="lazy" decoding="async"
                                      class="block max-w-full max-h-[62vh] w-auto h-auto object-contain rounded-xl border border-outline-variant shadow-sm">
                             </div>
                         </div>
@@ -744,7 +744,7 @@
                         <div class="mb-8" th:if="${complaint.resolution != null and complaint.resolution.hasResolutionImage()}">
                             <p class="font-label-md text-label-md text-on-surface-variant mb-2">After Resolved</p>
                             <div class="flex justify-center rounded-xl bg-surface-container-low p-3">
-                                <img th:src="${complaint.resolution.resolutionImageUrl}" alt="After resolved evidence"
+                                <img th:src="${@imageDelivery.url(complaint.resolution.resolutionImageUrl, 1200)}" alt="After resolved evidence" loading="lazy" decoding="async"
                                      class="block max-w-full max-h-[62vh] w-auto h-auto object-contain rounded-xl border border-outline-variant shadow-sm">
                             </div>
                             <div th:if="${complaint.resolution.citizenRating != null}"

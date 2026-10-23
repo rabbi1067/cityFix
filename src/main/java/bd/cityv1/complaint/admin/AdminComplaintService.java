@@ -5,7 +5,7 @@ import bd.cityv1.complaint.common.Complaint;
 import bd.cityv1.complaint.common.ComplaintRepository;
 import bd.cityv1.complaint.common.ComplaintResolution;
 import bd.cityv1.complaint.common.Status;
-import bd.cityv1.storage.SupabaseStorageService;
+import bd.cityv1.storage.CloudinaryStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +21,13 @@ import java.util.Set;
 public class AdminComplaintService {
 
     private final ComplaintRepository complaintRepository;
-    private final SupabaseStorageService storageService; 
+    private final CloudinaryStorageService storageService;
     public Complaint getComplaintById(Long id) {
         return complaintRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Complaint not found with id: " + id));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = IOException.class)
     public Complaint resolveOrUpdateComplaint(Long complaintId,
                                               ResolveComplaintRequest request,
                                               MultipartFile resolutionImage) throws IOException {
@@ -98,11 +98,10 @@ public class AdminComplaintService {
             }
 
             if (hasResolutionImage) {
-                if (resolution.hasResolutionImage()) {
-                    storageService.delete(resolution.getResolutionImageUrl());
-                }
+                String previousUrl = resolution.getResolutionImageUrl();
                 String url = storageService.upload(resolutionImage, "after");
                 resolution.setResolutionImageUrl(url);
+                storageService.deleteAfterCommit(previousUrl);
             }
         }
 

@@ -252,7 +252,7 @@
           <p class="text-label-sm text-on-surface-variant">Citizen User</p>
         </span>
         <img alt="Profile" class="w-9 h-9 rounded-full object-cover border border-outline-variant shadow-sm" id="header-avatar"
-             th:src="@{${citizen?.profileImagePath ?: '/profile1.jpg'}}">
+             th:src="${@imageDelivery.url(citizen?.profileImagePath ?: '/profile1.jpg', 256)}">
       </a>
     </div>
   </header>

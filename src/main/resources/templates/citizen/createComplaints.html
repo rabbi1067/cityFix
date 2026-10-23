@@ -201,7 +201,7 @@
           <p class="text-label-sm text-on-surface-variant">Citizen User</p>
         </span>
                 <img alt="Profile" class="w-9 h-9 rounded-full object-cover border border-outline-variant shadow-sm" id="header-avatar"
-                     th:src="@{${citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg'}}">
+                     th:src="${@imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
             </a>
         </div>
     </header>
@@ -268,6 +268,9 @@
                             <p class="font-body-md text-on-surface-variant">Fill out the details below to notify city services.</p>
                         </div>
                         <form id="complaint-form" class="p-8 space-y-8" enctype="multipart/form-data" method="post" th:action="@{/citizen/complaints/save}" th:object="${complaint}" novalidate>
+
+                            <p th:if="${uploadError != null}" th:text="${uploadError}"
+                               class="rounded-lg bg-error-container p-4 text-on-error-container" role="alert"></p>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="flex flex-col gap-2">

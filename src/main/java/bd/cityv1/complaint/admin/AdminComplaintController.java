@@ -78,6 +78,9 @@ public class AdminComplaintController {
             adminComplaintService.resolveOrUpdateComplaint(id, request, resolutionImage);
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("resolutionError", ex.getMessage());
+        } catch (IOException ex) {
+            redirectAttributes.addFlashAttribute("resolutionError",
+                    "We couldn't upload your image. Please try again.");
         }
         return "redirect:/admin/complaints/" + id + "/view";
     }

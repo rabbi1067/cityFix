@@ -54,6 +54,7 @@ public class Citizen {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
+    @jakarta.persistence.Column(length = 500)
     private String profileImagePath;
 
     @OneToMany(mappedBy = "citizen", cascade = CascadeType.ALL)

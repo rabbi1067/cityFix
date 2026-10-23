@@ -4,6 +4,7 @@ import bd.cityv1.citizen.register.Citizen;
 import bd.cityv1.citizen.register.CitizenRepository;
 import bd.cityv1.complaint.common.ComplaintRepository;
 import bd.cityv1.home.dto.ComplaintHomeDto;
+import bd.cityv1.storage.ImageDelivery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,7 @@ public class HomeController {
 
     private final CitizenRepository citizenRepository;
     private final ComplaintRepository complaintRepository;
+    private final ImageDelivery imageDelivery;
 
     @GetMapping("/")
     public String home(Model model) {
@@ -46,9 +48,9 @@ public class HomeController {
                                 ? "PENDING"
                                 : complaint.getStatus().name(),
 
-                        // IMPORTANT: Send Supabase image URL directly
+                        // Send a small CDN image for homepage cards.
                         complaint.hasImage()
-                                ? complaint.getImageUrl()
+                                ? imageDelivery.url(complaint.getImageUrl(), 480)
                                 : null,
 
                         complaint.getCreatedAt() == null

@@ -1,0 +1,10 @@
+# Copy to application-local.properties in the project root for local development.
+# The real file is ignored by Git/Docker. Do not commit real secrets.
+DB_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require
+DB_USERNAME=postgres.emlanhdksprgmkhpjhlq
+DB_PASSWORD=replace-with-your-database-password
+CLOUDINARY_CLOUD_NAME=replace-with-your-cloud-name
+CLOUDINARY_API_KEY=replace-with-your-api-key
+CLOUDINARY_API_SECRET=replace-with-your-api-secret
+MAIL_USERNAME=replace-with-your-email
+MAIL_PASSWORD=replace-with-your-app-password

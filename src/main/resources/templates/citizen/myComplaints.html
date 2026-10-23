@@ -161,7 +161,7 @@
                     <img alt="Profile"
                          class="w-9 h-9 rounded-full object-cover border border-outline-variant shadow-sm"
                          id="header-avatar"
-                         th:src="@{${citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg'}}">
+                         th:src="${@imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
                 </a>
                 <div th:if="${ratingSuccess != null}" id="ratingSuccessToast" class="rating-toast" role="status" aria-live="polite">
                     <span class="material-symbols-outlined text-green-400" aria-hidden="true">check_circle</span>
@@ -390,7 +390,7 @@
             <div class="mb-8" th:if="${complaint.hasImage()}">
                 <p class="font-label-md text-label-md text-on-surface-variant mb-2">Visual Evidence</p>
                 <div class="flex justify-center">
-                    <img th:src="${complaint.imageUrl}" alt="Complaint evidence"
+                    <img th:src="${@imageDelivery.url(complaint.imageUrl, 1200)}" alt="Complaint evidence" loading="lazy" decoding="async"
                           class="block max-w-full max-h-[62vh] w-auto h-auto object-contain rounded-xl border border-outline-variant shadow-sm">
                 </div>
             </div>
@@ -409,7 +409,7 @@
                     <h2 th:id="'resolution-feedback-title-' + ${complaint.id}" class="font-title-md text-on-surface">After Resolved</h2>
                 </div>
                 <div class="flex justify-center rounded-xl bg-surface-container-low p-3">
-                    <img th:src="${complaint.resolution.resolutionImageUrl}" alt="After resolved evidence"
+                    <img th:src="${@imageDelivery.url(complaint.resolution.resolutionImageUrl, 1200)}" alt="After resolved evidence" loading="lazy" decoding="async"
                          class="block max-w-full max-h-[52vh] w-auto h-auto object-contain rounded-xl border border-outline-variant shadow-sm">
                 </div>
                 <div class="mt-5 rounded-xl bg-surface-container-lowest border border-outline-variant/40 p-4">

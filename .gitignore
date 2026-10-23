@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local credentials and generated files
+.env
+.env.*
+!.env.example
+application-local.properties
+logs/
+uploads/

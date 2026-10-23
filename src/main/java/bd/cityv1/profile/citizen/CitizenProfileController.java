@@ -3,6 +3,7 @@ package bd.cityv1.profile.citizen;
 import bd.cityv1.citizen.register.Citizen;
 import bd.cityv1.profile.citizen.dto.UpdatePersonalInfoDto;
 import bd.cityv1.profile.common.ChangePasswordDto;
+import bd.cityv1.storage.ImageDelivery;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class CitizenProfileController {
 
     private final CitizenProfileService citizenProfileService;
+    private final ImageDelivery imageDelivery;
 
     @GetMapping("/profile")
     public String profile(Model model, Authentication authentication) {
@@ -60,7 +62,7 @@ public class CitizenProfileController {
         Citizen updated = citizenProfileService.updateAvatar(authentication.getName(), image);
         return ResponseEntity.ok(Map.of(
                 "message", "Profile photo updated!",
-                "imagePath", updated.getProfileImagePath()
+                "imagePath", imageDelivery.url(updated.getProfileImagePath(), 256)
         ));
     }
 
@@ -75,5 +77,11 @@ public class CitizenProfileController {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntime(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<?> handleImageUploadFailure(IOException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of("error", "We couldn't upload your image. Please try again."));
     }
 }

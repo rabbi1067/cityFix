@@ -92,7 +92,7 @@
                     <p class="text-label-sm text-on-surface-variant">Citizen User</p>
                 </span>
                 <img alt="Profile" class="w-9 h-9 rounded-full object-cover border border-outline-variant shadow-sm" id="header-avatar"
-                     th:src="@{${citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg'}}">
+                     th:src="${@imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
             </a>
         </div>
     </header>
@@ -108,7 +108,7 @@
                     <div class="relative group" id="avatar-container">
                         <div class="absolute inset-0 bg-primary/20 rounded-full blur-lg scale-90 group-hover:scale-110 transition-transform duration-500"></div>
                         <img alt="Profile" class="relative w-32 h-32 rounded-full object-cover shadow-xl border-4 border-surface-container-lowest" id="hero-avatar"
-                             th:src="@{${citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg'}}">
+                             th:src="${@imageDelivery.url(citizen.profileImagePath != null ? citizen.profileImagePath : '/profile1.jpg', 256)}">
                         <label for="avatar-input" class="absolute bottom-0 right-0 p-2 bg-primary text-on-primary rounded-full shadow-lg hover:scale-110 transition-transform cursor-pointer z-10">
                             <span class="material-symbols-outlined text-[18px]">photo_camera</span>
                         </label>
@@ -543,11 +543,9 @@
                 }
 
                 if (data.imagePath) {
-                    // Prevent the browser from displaying an old cached image.
-                    const separator = data.imagePath.includes('?') ? '&' : '?';
-                    const cacheBustedPath = data.imagePath + separator + 't=' + Date.now();
-                    heroAvatar.src = cacheBustedPath;
-                    headerAvatar.src = cacheBustedPath;
+                    // Each uploaded image has a unique URL that can be cached by the CDN.
+                    heroAvatar.src = data.imagePath;
+                    headerAvatar.src = data.imagePath;
                 }
 
                 window.cityfixPublishProfile?.(null, headerAvatar.src);

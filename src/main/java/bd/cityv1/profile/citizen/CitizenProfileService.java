@@ -5,14 +5,13 @@ import bd.cityv1.citizen.register.CitizenRepository;
 import bd.cityv1.profile.citizen.dto.UpdatePersonalInfoDto;
 import bd.cityv1.profile.common.ChangePasswordDto;
 import bd.cityv1.profile.common.PasswordChangeService;
+import bd.cityv1.storage.CloudinaryStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +19,7 @@ public class CitizenProfileService {
 
     private final CitizenRepository citizenRepository;
     private final PasswordChangeService passwordChangeService;
-
-    private static final String UPLOAD_DIR = "uploads/";
+    private final CloudinaryStorageService storageService;
 
     public Citizen getCitizen(String email) {
         return citizenRepository.findByEmail(email)
@@ -51,6 +49,7 @@ public class CitizenProfileService {
         citizenRepository.save(citizen);
     }
 
+    @Transactional(rollbackFor = IOException.class)
     public Citizen updateAvatar(String email, MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             throw new RuntimeException("Please select an image to upload");
@@ -67,11 +66,9 @@ public class CitizenProfileService {
 
         Citizen citizen = getCitizen(email);
 
-        Files.createDirectories(Path.of(UPLOAD_DIR));
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Files.write(Path.of(UPLOAD_DIR + fileName), file.getBytes());
-
-        citizen.setProfileImagePath("/" + UPLOAD_DIR + fileName);
+        String previousUrl = citizen.getProfileImagePath();
+        citizen.setProfileImagePath(storageService.upload(file, "avatars"));
+        storageService.deleteAfterCommit(previousUrl);
         return citizenRepository.save(citizen);
     }
 }
